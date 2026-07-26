@@ -9,7 +9,8 @@ import { requestLogger } from "./shared/middlewares/requestLogger.js";
 import { globalRateLimiter } from "./shared/middlewares/rateLimiter.js";
 import { notFound } from "./shared/middlewares/notFound.js";
 import { globalErrorHandler } from "./shared/errors/globalErrorHandler.js";
-import router from "./routes/index.js";
+import { routes } from "./routes/index.js";
+
 
 const app: Application = express();
 
@@ -110,7 +111,7 @@ app.get("/", (_req: Request, res: Response) => {
  * API Routes
  * -----------------------------------------------------
  */
-app.use("/api/v1", router);
+app.use("/api/v1", routes);
 
 /**
  * -----------------------------------------------------
