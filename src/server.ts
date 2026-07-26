@@ -1,48 +1,69 @@
 import http from "node:http";
 
 import app from "./app.js";
+import { env } from "./config/env.js";
+import { logger } from "./config/logger.js";
 import { prisma } from "./lib/prisma.js";
 
+const PORT = env.PORT;
 
-const PORT = Number(process.env.PORT) || 5000;
+let server: http.Server;
+
+async function shutdown(signal?: string) {
+  logger.info(`Received ${signal ?? "shutdown"} signal.`);
+
+  if (server) {
+    server.close(async () => {
+      try {
+        await prisma.$disconnect();
+        logger.info("Database disconnected.");
+        process.exit(0);
+      } catch (error) {
+        logger.error(error);
+        process.exit(1);
+      }
+    });
+  } else {
+    await prisma.$disconnect();
+    process.exit(0);
+  }
+}
 
 async function bootstrap() {
   try {
-    // Connect DB
     await prisma.$connect();
-    console.log("✅ Database connected.");
 
-    const server = http.createServer(app);
+    logger.info("Database connected.");
+
+    server = http.createServer(app);
 
     server.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      logger.info(`Server running on http://localhost:${PORT}`);
     });
 
-    const shutdown = async () => {
-      console.log("Shutting down...");
+    server.keepAliveTimeout = 65000;
+    server.headersTimeout = 66000;
 
-      server.close(async () => {
-        await prisma.$disconnect();
-        console.log("✅ Database disconnected.");
-        process.exit(0);
-      });
-    };
-
-    process.on("SIGINT", shutdown);
-    process.on("SIGTERM", shutdown);
-
-    process.on("unhandledRejection", async (err) => {
-      console.error("Unhandled Rejection:", err);
-      await shutdown();
+    process.on("SIGINT", () => {
+      void shutdown("SIGINT");
     });
 
-    process.on("uncaughtException", (err) => {
-      console.error("Uncaught Exception:", err);
+    process.on("SIGTERM", () => {
+      void shutdown("SIGTERM");
+    });
+
+    process.on("unhandledRejection", (reason) => {
+      logger.error(reason);
+      void shutdown("Unhandled Rejection");
+    });
+
+    process.on("uncaughtException", (error) => {
+      logger.error(error);
       process.exit(1);
     });
+
   } catch (error) {
-    console.error("❌ Failed to connect to database.");
-    console.error(error);
+    logger.error(error);
     process.exit(1);
   }
 }
