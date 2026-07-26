@@ -3,7 +3,7 @@ import { ErrorRequestHandler } from "express";
 import { ZodError } from "zod";
 
 import AppError from "./AppError.js";
-import { logger } from "../../config/logger";
+import { logger } from "../../config/logger.js";
 import { Prisma } from "@prisma/client";
 
 
