@@ -50,29 +50,19 @@ export const logger = winston.createLogger({
     }),
 
 
-    /**
-     * Error Logs
-     */
-    new winston.transports.File({
-
-      filename:
-        "logs/error.log",
-
-      level:
-        "error",
-
-    }),
-
-
-    /**
-     * All Logs
-     */
-    new winston.transports.File({
-
-      filename:
-        "logs/combined.log",
-
-    }),
+    // Vercel's deployed function filesystem is read-only. Its console output
+    // is collected by Vercel, so avoid file transports there.
+    ...(process.env.VERCEL
+      ? []
+      : [
+          new winston.transports.File({
+            filename: "logs/error.log",
+            level: "error",
+          }),
+          new winston.transports.File({
+            filename: "logs/combined.log",
+          }),
+        ]),
 
   ],
 
