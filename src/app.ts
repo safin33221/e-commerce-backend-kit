@@ -6,7 +6,7 @@ import cookieParser from "cookie-parser";
 
 import { corsOptions } from "./config/cors.js";
 import { requestLogger } from "./shared/middlewares/requestLogger.js";
-import { globalRateLimiter } from "./shared/middlewares/rateLimiter.js";
+
 import { notFound } from "./shared/middlewares/notFound.js";
 import { globalErrorHandler } from "./shared/errors/globalErrorHandler.js";
 import { routes } from "./routes/index.js";
@@ -85,7 +85,6 @@ app.use(requestLogger);
  * Rate Limiter
  * -----------------------------------------------------
  */
-app.use(globalRateLimiter);
 
 /**
  * -----------------------------------------------------
