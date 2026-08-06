@@ -3,44 +3,134 @@ import { z } from "zod";
 
 dotenv.config();
 
-const envSchema = z.object({
-  NODE_ENV: z.enum(["development", "production", "test"]),
+const envSchema = z
+  .object({
+    /**
+     * App
+     */
+    NODE_ENV: z
+      .enum(["development", "production", "test"])
+      .default("development"),
 
-  PORT: z.coerce.number().default(5000),
+    APP_NAME: z
+      .string()
+      .default("E-Commerce Backend Kit"),
 
-  DATABASE_URL: z.string().min(1),
+    PORT: z.coerce.number().default(5000),
 
-  JWT_ACCESS_SECRET: z.string().min(32),
+    API_PREFIX: z.string().default("/api/v1"),
 
-  JWT_ACCESS_EXPIRES_IN: z.string(),
+    /**
+     * Database
+     */
+    DATABASE_URL: z.string().min(1),
 
-  JWT_REFRESH_SECRET: z.string().min(32),
+    /**
+     * Authentication
+     */
+    JWT_ACCESS_SECRET: z.string().min(32),
 
-  JWT_REFRESH_EXPIRES_IN: z.string(),
+    JWT_ACCESS_EXPIRES_IN: z.string().default("15m"),
 
-  BCRYPT_SALT_ROUNDS: z.coerce.number().default(12),
+    JWT_REFRESH_SECRET: z.string().min(32),
 
-  FRONTEND_URL: z.string().url(),
+    JWT_REFRESH_EXPIRES_IN: z.string().default("30d"),
 
-  COOKIE_SECRET: z.string().min(16),
+    BCRYPT_SALT_ROUNDS: z.coerce.number().default(12),
 
-  CLOUDINARY_CLOUD_NAME: z.string(),
+    /**
+     * Cookies
+     */
+    COOKIE_SECRET: z.string().min(16),
 
-  CLOUDINARY_API_KEY: z.string(),
+    COOKIE_DOMAIN: z.string().optional(),
 
-  CLOUDINARY_API_SECRET: z.string(),
+    COOKIE_SECURE: z
+      .enum(["true", "false"])
+      .default("false")
+      .transform((value) => value === "true"),
 
-  REDIS_URL: z.string().optional(),
-});
+    COOKIE_SAME_SITE: z
+      .enum(["lax", "strict", "none"])
+      .default("lax"),
+
+    /**
+     * Frontend
+     */
+    FRONTEND_URL: z.string().url(),
+
+    /**
+     * Encryption
+     */
+    ENCRYPTION_SECRET: z.string().min(32),
+
+    /**
+     * Redis
+     */
+    REDIS_URL: z.string().optional(),
+
+    /**
+     * Cloudinary
+     */
+    CLOUDINARY_CLOUD_NAME: z.string(),
+
+    CLOUDINARY_API_KEY: z.string(),
+
+    CLOUDINARY_API_SECRET: z.string(),
+
+    /**
+     * Email
+     */
+    SMTP_HOST: z.string().optional(),
+
+    SMTP_PORT: z.coerce.number().optional(),
+
+    SMTP_USER: z.string().optional(),
+
+    SMTP_PASS: z.string().optional(),
+
+    SMTP_FROM: z.string().email().optional(),
+
+    /**
+     * Logger
+     */
+    LOG_LEVEL: z
+      .enum(["error", "warn", "info", "http", "debug"])
+      .default("info"),
+
+    /**
+     * Rate Limit
+     */
+    RATE_LIMIT_WINDOW_MS: z.coerce
+      .number()
+      .default(15 * 60 * 1000),
+
+    RATE_LIMIT_MAX_REQUESTS: z.coerce
+      .number()
+      .default(100),
+
+    /**
+     * Upload
+     */
+    MAX_FILE_SIZE: z.coerce
+      .number()
+      .default(5 * 1024 * 1024),
+  })
+  .superRefine((env, ctx) => {
+    if (env.NODE_ENV === "production" && !env.REDIS_URL) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["REDIS_URL"],
+        message: "REDIS_URL is required in production.",
+      });
+    }
+  });
 
 const parsedEnv = envSchema.safeParse(process.env);
 
 if (!parsedEnv.success) {
-  console.error(
-    "❌ Invalid environment variables:\n",
-    parsedEnv.error.flatten().fieldErrors
-  );
-
+  console.error("\n❌ Invalid environment variables:\n");
+  console.error(parsedEnv.error.format());
   process.exit(1);
 }
 
