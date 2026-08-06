@@ -1,0 +1,28 @@
+model Banner {
+
+  id          String   @id @default(cuid())
+
+  title       String
+
+  subtitle    String?
+
+  image       String
+
+  buttonText  String?
+
+  buttonLink  String?
+
+  position    BannerPosition
+
+  isActive    Boolean @default(true)
+
+  sortOrder   Int @default(0)
+
+  startsAt    DateTime?
+
+  endsAt      DateTime?
+
+  createdAt   DateTime @default(now())
+
+  updatedAt   DateTime @updatedAt
+}

@@ -1,0 +1,54 @@
+model Coupon {
+    id String @id @default(cuid())
+
+    code String @unique
+
+    name String
+
+    description String?
+
+    type CouponType
+
+    value Decimal @db.Decimal(10, 2)
+
+    minimumOrderAmount Decimal? @db.Decimal(10, 2)
+
+    maximumDiscount Decimal? @db.Decimal(10, 2)
+
+    usageLimit Int?
+
+    usedCount Int @default(0)
+
+    startsAt DateTime?
+
+    expiresAt DateTime?
+
+    isActive Boolean @default(true)
+
+    orders Order[]
+
+    createdAt DateTime @default(now())
+
+    updatedAt    DateTime      @updatedAt
+    couponUsages CouponUsage[]
+}
+
+model CouponUsage {
+    id String @id @default(cuid())
+
+    couponId String
+
+    userId String
+
+    orderId String
+
+    usedAt DateTime @default(now())
+
+    coupon Coupon @relation(fields: [couponId], references: [id])
+
+    user User @relation(fields: [userId], references: [id])
+
+    order Order @relation(fields: [orderId], references: [id])
+
+    @@unique([couponId, userId])
+}

@@ -1,0 +1,29 @@
+model Payment {
+    id String @id @default(cuid())
+
+    orderId String @unique
+
+    order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+    transactionId String?
+
+    gatewayId String
+    gateway   PaymentGateway @relation(fields: [gatewayId], references: [id])
+
+    amount Decimal @db.Decimal(10, 2)
+
+    status PaymentStatus
+
+    paidAt DateTime?
+
+    createdAt DateTime @default(now())
+}
+
+model PaymentGateway {
+    id       String  @id @default(cuid())
+    name     String  @unique
+    code     String  @unique // sslcommerz, stripe, bkash
+    isActive Boolean @default(true)
+
+    payments Payment[]
+}

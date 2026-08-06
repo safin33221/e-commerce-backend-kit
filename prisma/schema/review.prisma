@@ -1,0 +1,18 @@
+model Review {
+
+  id String @id @default(cuid())
+
+  rating Int
+
+  comment String?
+
+  userId String
+
+  productId String
+
+  user User @relation(fields:[userId], references:[id])
+
+  product Product @relation(fields:[productId], references:[id])
+
+  createdAt DateTime @default(now())
+}

@@ -1,0 +1,20 @@
+model Page {
+
+  id String @id @default(cuid())
+
+  title String
+
+  slug String @unique
+
+  content Json
+
+  metaTitle String?
+
+  metaDescription String?
+
+  isPublished Boolean @default(true)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+}

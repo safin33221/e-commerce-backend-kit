@@ -1,0 +1,47 @@
+enum OrderStatus {
+    PENDING
+    CONFIRMED
+    PROCESSING
+    PACKED
+    SHIPPED
+    DELIVERED
+    CANCELLED
+    RETURNED
+}
+
+enum PaymentStatus {
+    PENDING
+    PAID
+    FAILED
+    REFUNDED
+    PARTIALLY_REFUNDED
+}
+
+enum PaymentMethod {
+    COD
+    SSLCOMMERZ
+    STRIPE
+    BKASH
+    NAGAD
+    ROCKET
+}
+
+enum InventoryTransactionType {
+    PURCHASE
+    SALE
+    RETURN
+    DAMAGE
+    ADJUSTMENT
+}
+enum CouponType {
+  FIXED
+  PERCENTAGE
+}
+
+enum BannerPosition {
+  HERO
+  TOP
+  MIDDLE
+  BOTTOM
+  POPUP
+}

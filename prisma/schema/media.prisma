@@ -1,0 +1,18 @@
+model Media {
+
+  id String @id @default(cuid())
+
+  fileName String
+
+  originalName String
+
+  url String
+
+  mimeType String
+
+  size Int
+
+  altText String?
+
+  createdAt DateTime @default(now())
+}
