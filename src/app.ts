@@ -1,5 +1,5 @@
 import express, { Application, Request, Response } from "express";
-import helmet from "helmet";
+
 import cors from "cors";
 import compression from "compression";
 import cookieParser from "cookie-parser";
@@ -32,11 +32,7 @@ app.set("trust proxy", 1);
  * Security
  * -----------------------------------------------------
  */
-app.use(
-  helmet({
-    crossOriginResourcePolicy: false,
-  })
-);
+//helmet
 
 /**
  * -----------------------------------------------------
